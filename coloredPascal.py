@@ -1,6 +1,29 @@
 import pygame
 import sys
 
+# Cell_Size Constants
+BIG_CELL_SIZE = 20
+MEDIUM_CELL_SIZE = 10
+SMALL_CELL_SIZE = 5
+SUPER_SMALL_CELL_SIZE = 2
+
+# UI Color Constants
+BUTTON_COLOR = (240, 240, 240)  # Light gray
+BUTTON_HOVER_COLOR = (180, 180, 180)  # Darker gray for hover
+TEXT_COLOR = (0, 0, 0)  # Black
+
+# Color palette for remainder values
+colors = [
+    (50, 168, 82),   # Green
+    (0, 0, 0),       # Black for remainder 1
+    (219, 68, 55),   # Red
+    (66, 133, 244),  # Blue
+    (123, 31, 162),  # Purple
+    (255, 128, 0),   # Orange
+    (0, 188, 212)    # Cyan
+]
+
+
 # Memoization dictionary to store binomial coefficients
 binomial_cache = {}
 
@@ -14,9 +37,17 @@ def binomial_coefficient(n, k):
     binomial_cache[(n, k)] = result
     return result
 
-# Function to draw Pascal's triangle
-def draw_pascals_triangle(screen, rows, divisor, cell_size):
-    colors = [(255, 255, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
+def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
+    if cell_size == BIG_CELL_SIZE:
+        rows = 45
+    elif cell_size == MEDIUM_CELL_SIZE:
+        rows = 93
+    elif cell_size == SMALL_CELL_SIZE:
+        rows = 180
+    elif cell_size == SUPER_SMALL_CELL_SIZE:
+        rows = 465
+    
+    """Draw Pascal's triangle with updated color palette."""
     start_x = 500
     start_y = 50
 
@@ -24,11 +55,16 @@ def draw_pascals_triangle(screen, rows, divisor, cell_size):
         for k in range(n + 1):
             value = binomial_coefficient(n, k)
             remainder = value % divisor
-            color = colors[remainder % len(colors)]
+            color = colors[remainder % len(colors)]  # Cycle through colors
             x = start_x + (k - n / 2) * cell_size
             y = start_y + n * cell_size
             pygame.draw.rect(screen, color, (x, y, cell_size, cell_size))
-            pygame.draw.rect(screen, color, (x, y, cell_size, cell_size))  # Remove gaps by drawing the same color border
+            if show_rem or cell_size == 20:
+                # Optionally add text inside each cell
+                font = pygame.font.Font(None, 24)
+                text = font.render(str(remainder), True, (255, 255, 255))  # White text
+                text_rect = text.get_rect(center=(x + cell_size / 2, y + cell_size / 2))
+                screen.blit(text, text_rect)
 
 def get_input(prompt, x, y):
     pygame.font.init()
@@ -72,10 +108,42 @@ def get_input(prompt, x, y):
     return text
 
 def draw_button(screen, text, x, y, width, height, color):
-    pygame.draw.rect(screen, color, (x, y, width, height))
+    # Get mouse position and create button rectangle
+    mouse_pos = pygame.mouse.get_pos()
+    button_rect = pygame.Rect(x, y, width, height)
+    
+    # Check if mouse is hovering over button
+    is_hovered = button_rect.collidepoint(mouse_pos)
+    
+    # Draw button with appropriate color
+    pygame.draw.rect(screen, BUTTON_HOVER_COLOR if is_hovered else color, button_rect)
+    
     font = pygame.font.Font(None, 36)
     text_surface = font.render(text, True, (0, 0, 0))
-    screen.blit(text_surface, (x + (width - text_surface.get_width()) // 2, y + (height - text_surface.get_height()) // 2))
+    text_rect = text_surface.get_rect(center=button_rect.center)
+    screen.blit(text_surface, text_rect)
+    # screen.blit(text_surface, (x + (width - text_surface.get_width()) // 2, y + (height - text_surface.get_height()) // 2))
+    # Return both rectangle and hover state for click detection
+    return button_rect, is_hovered
+
+def draw_ui(divisor=None, cell_size=None):
+    """Redraw the static UI components, including the entered values."""
+    # Display entered divisor
+    font = pygame.font.Font(None, 36)
+
+    # Draw buttons and store both rectangles and hover states
+    big_rect, big_hover = draw_button(screen, "Big", 50, 150, 200, 50, BUTTON_COLOR)
+    med_rect, med_hover = draw_button(screen, "Medium", 50, 220, 200, 50, BUTTON_COLOR)
+    small_rect, small_hover = draw_button(screen, "Small", 50, 290, 200, 50, BUTTON_COLOR)
+    super_rect, super_hover = draw_button(screen, "Super Small", 50, 360, 200, 50, BUTTON_COLOR)
+
+    return (big_rect, big_hover), (med_rect, med_hover), (small_rect, small_hover), (super_rect, super_hover)
+
+def draw_reset_text():
+    font = pygame.font.Font(None, 36)
+    text = font.render("Press Enter to Reset", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(800, 200))  # Center on right side
+    screen.blit(text, text_rect)
 
 def main():
     pygame.init()
@@ -83,56 +151,55 @@ def main():
     screen = pygame.display.set_mode((1000, 1000))
     pygame.display.set_caption("Pascal's Triangle")
 
+
     while True:
-        screen.fill((0, 0, 0))
-        rows = int(get_input("Rows: ", 50, 50))
-        divisor = int(get_input("Divisor: ", 50, 100))
-
-        # Draw buttons for cell size selection
-        draw_button(screen, "Big", 50, 150, 200, 50, (255, 255, 255))
-        draw_button(screen, "Medium", 50, 220, 200, 50, (255, 255, 255))
-        draw_button(screen, "Small", 50, 290, 200, 50, (255, 255, 255))
-        draw_button(screen, "Super Small", 50, 360, 200, 50, (255, 255, 255))
+        screen.fill((20, 20, 40)) # Dark blue-gray background
+        
+        # Draw UI elements
+        buttons = draw_ui()
         pygame.display.flip()
-
-        cell_size = 10  # Default to medium if no button is clicked
-
+        
+        # Get divisor input while keeping buttons visible
+        divisor = int(get_input("Divisor: ", 50, 100))
+        
         # Wait for the user to click a button
         button_clicked = False
         while not button_clicked:
+            # Get button states
+            buttons = draw_ui(divisor=divisor)
+            pygame.display.flip()
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = event.pos
-                    if 50 <= mouse_x <= 250:
-                        if 150 <= mouse_y <= 200:
-                            cell_size = 20
+                    mouse_pos = pygame.mouse.get_pos()
+                    for (rect, hover), size in zip(buttons, 
+                        [BIG_CELL_SIZE, MEDIUM_CELL_SIZE, SMALL_CELL_SIZE, SUPER_SMALL_CELL_SIZE]):
+                        if rect.collidepoint(mouse_pos):
+                            cell_size = size
                             button_clicked = True
-                        elif 220 <= mouse_y <= 270:
-                            cell_size = 10
-                            button_clicked = True
-                        elif 290 <= mouse_y <= 340:
-                            cell_size = 5
-                            button_clicked = True
-                        elif 360 <= mouse_y <= 410:
-                            cell_size = 2
-                            button_clicked = True
+                            break
+        
+        # Clear only triangle area (right side of screen)
+        pygame.draw.rect(screen, (20, 20, 40), (300, 0, 700, 1000))
 
-        screen.fill((0, 0, 0))  # Clear the screen before drawing
-        draw_pascals_triangle(screen, rows, divisor, cell_size)
+        # Draw triangle
+        draw_pascals_triangle(screen, divisor, cell_size)
+        draw_reset_text()  # Add reset text
         pygame.display.flip()
 
-        # Pause to allow the user to see the result
-        pause = True
-        while pause:
+        # Wait for Enter key
+        waiting = True
+        while waiting:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                    pause = False
+                    waiting = False
+                    pygame.display.flip()
 
 if __name__ == "__main__":
     main()
