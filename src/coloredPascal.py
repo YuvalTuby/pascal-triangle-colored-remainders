@@ -1,4 +1,4 @@
-VERSION = "v-0.0.7"
+VERSION = "v-0.0.8"
 GITHUB_USERNAME = "YuvalTuby"
 
 import pygame
@@ -280,7 +280,15 @@ def main():
         pygame.display.flip()
         
         # Get divisor input while keeping buttons visible
-        divisor = int(get_input("Divisor: ", 50, 100))
+        while True:
+            try:
+                divisor = int(get_input("Divisor: ", 50, 100))
+                if divisor > 0:  # Ensure positive divisor
+                    break
+                else:
+                    print("Please enter a positive number")
+            except ValueError:
+                print("Please enter a valid integer")
         
         # Wait for the user to click a button
         button_clicked = False
@@ -345,12 +353,13 @@ def save_triangle_as_image(divisor, cell_size, rows):
     
     # Initialize Tkinter root window (hidden)
     Tk().withdraw()  # Hide the root window
-    # Open the save file dialog
+    # Create a suggested filename with timestamp and parameters
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    suggested_name = f"pascal__mod_{divisor}.png"
     filename = asksaveasfilename(defaultextension=".png",
-                                 filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
-                                 title="Save Pascal's Triangle")
-    
-    # If the user selected a file
+                                filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+                                title="Save Pascal's Triangle",
+                                initialfile=suggested_name)
     if filename:
         pygame.image.save(save_surface, filename)
         print(f"Triangle saved as {filename}")
