@@ -9,6 +9,7 @@ BIG_CELL_SIZE = 20
 MEDIUM_CELL_SIZE = 10
 SMALL_CELL_SIZE = 5
 SUPER_SMALL_CELL_SIZE = 2
+SMALLEST_CELL_SIZE = 1
 
 # UI Color Constants
 BUTTON_COLOR = (240, 240, 240)  # Light gray
@@ -62,17 +63,18 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
     colors = generate_color_palette(divisor)
     
     if cell_size == BIG_CELL_SIZE:
-        rows = 45
+        rows = 48
     elif cell_size == MEDIUM_CELL_SIZE:
-        rows = 93
+        rows = 97
     elif cell_size == SMALL_CELL_SIZE:
-        rows = 180
+        rows = 194
     elif cell_size == SUPER_SMALL_CELL_SIZE:
-        rows = 465
+        rows = 485
+        # rows = 970
     
     """Draw Pascal's triangle with updated color palette."""
     start_x = 500
-    start_y = 50
+    start_y = 20
 
     for n in range(rows):
         for k in range(n + 1):
@@ -153,6 +155,8 @@ def draw_ui(divisor=None, cell_size=None):
     """Redraw the static UI components, including the entered values."""
     # Display entered divisor
     font = pygame.font.Font(None, 36)
+    
+    
 
     # Draw buttons and store both rectangles and hover states
     big_rect, big_hover = draw_button(screen, "Big", 50, 150, 200, 50, BUTTON_COLOR)
@@ -167,6 +171,27 @@ def draw_reset_text():
     text = font.render("Press ESC\Enter to Reset", True, (255, 255, 255))
     text_rect = text.get_rect(center=(800, 200))  # Center on right side
     screen.blit(text, text_rect)
+    
+def PyHebText(txtString=''):
+    """Convert Hebrew text to text suitable for pygame."""
+    # Reverse the string and return it
+    return txtString[::-1]
+    
+def draw_basad_text():
+    # Load a font that supports Hebrew
+    font_path = "Arial.ttf"  # Replace with the correct path to a Hebrew-supporting font
+    font = pygame.font.Font(font_path, 20)
+    
+    # Hebrew text
+    basad = "בס\"ד"
+    hebrew_text = PyHebText(basad)
+    
+    # Render the text with the appropriate font
+    text = font.render(hebrew_text, True, (255, 255, 255))  # White color text
+    
+    # Get the text's rectangle and position it
+    text_rect = text.get_rect(center=(950, 30))  # Adjust position as needed
+    screen.blit(text, text_rect)
 
 def main():
     pygame.init()
@@ -177,6 +202,7 @@ def main():
 
     while True:
         screen.fill((20, 20, 40)) # Dark blue-gray background
+        draw_basad_text()
         
         # Draw UI elements
         buttons = draw_ui()
@@ -207,6 +233,7 @@ def main():
         
         # Clear only triangle area (right side of screen)
         pygame.draw.rect(screen, (20, 20, 40), (300, 0, 700, 1000))
+        draw_basad_text()
 
         # Draw triangle
         rows = {BIG_CELL_SIZE: 45, MEDIUM_CELL_SIZE: 93, SMALL_CELL_SIZE: 180, SUPER_SMALL_CELL_SIZE: 465}[cell_size]
