@@ -6,6 +6,9 @@ import sys
 from tkinter import Tk
 from tkinter.filedialog import asksaveasfilename
 from datetime import datetime
+from pathlib import Path
+
+FILE_DIR = Path(__file__).resolve().parent
 
 # Cell_Size Constants
 BIG_CELL_SIZE = 20
@@ -182,7 +185,7 @@ def PyHebText(txtString=''):
     
 def draw_basad_text():
     # Load a font that supports Hebrew
-    font_path = "Arial.ttf"  # Replace with the correct path to a Hebrew-supporting font
+    font_path = FILE_DIR / "Arial.ttf"  # Replace with the correct path to a Hebrew-supporting font
     font = pygame.font.Font(font_path, 20)
     
     # Hebrew text
