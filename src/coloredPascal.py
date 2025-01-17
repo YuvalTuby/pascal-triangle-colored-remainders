@@ -1,4 +1,4 @@
-VERSION = "v-0.0.6"
+VERSION = "v-0.0.7"
 GITHUB_USERNAME = "YuvalTuby"
 
 import pygame
@@ -83,7 +83,7 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
         # rows = 970
     
     """Draw Pascal's triangle with updated color palette."""
-    start_x = 500
+    start_x = WINDOW_SIZE // 2
     start_y = 20
 
     for n in range(rows):
@@ -94,7 +94,7 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
             x = start_x + (k - n / 2) * cell_size
             y = start_y + n * cell_size
             pygame.draw.rect(screen, color, (x, y, cell_size, cell_size))
-            if show_rem or cell_size == 20:
+            if show_rem or cell_size == BIG_CELL_SIZE:
                 # Optionally add text inside each cell
                 font = pygame.font.Font(None, 24)
                 text = font.render(str(remainder), True, (255, 255, 255))  # White text
@@ -142,7 +142,7 @@ def get_input(prompt, x, y):
 
     return text
 
-def draw_button(screen, text, x, y, width, height, color):
+def draw_button(screen, text, x, y, width, height, color, font_size=36):
     # Get mouse position and create button rectangle
     mouse_pos = pygame.mouse.get_pos()
     button_rect = pygame.Rect(x, y, width, height)
@@ -153,7 +153,7 @@ def draw_button(screen, text, x, y, width, height, color):
     # Draw button with appropriate color
     pygame.draw.rect(screen, BUTTON_HOVER_COLOR if is_hovered else color, button_rect)
     
-    font = pygame.font.Font(None, 36)
+    font = pygame.font.Font(None, font_size)
     text_surface = font.render(text, True, (0, 0, 0))
     text_rect = text_surface.get_rect(center=button_rect.center)
     screen.blit(text_surface, text_rect)
@@ -177,12 +177,20 @@ def draw_ui(divisor=None, cell_size=None):
     return (big_rect, big_hover), (med_rect, med_hover), (small_rect, small_hover), (super_rect, super_hover)
 
 def draw_reset_text():
-    font = pygame.font.Font(None, 36)
+    font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
+    font = pygame.font.Font(None, font_size)
     text = font.render("Press ESC\Enter to Reset", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(800, 200))  # Center on right side
+    
+    # Position text proportionally to window
+    text_x = int(WINDOW_SIZE * 0.8)  # 75% from left, matching save button
+    text_y = int(WINDOW_SIZE * 0.20)  # 20% from top
+    
+    text_rect = text.get_rect(center=(text_x, text_y))  # Center on right side
     screen.blit(text, text_rect)
     
 def draw_save_button():
+    font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
+
     # Define the button dimensions as a proportion of the window size
     button_width = int(WINDOW_SIZE * 0.22)  # 22% of the window width
     button_height = int(WINDOW_SIZE * 0.05)  # 5% of the window height
@@ -192,7 +200,7 @@ def draw_save_button():
     button_y = int(WINDOW_SIZE * 0.30)  # 30% from the top
     
     # Draw the button
-    save_button_rect, save_hover = draw_button(screen, "Press 'S' to Save", button_x, button_y, button_width, button_height, BUTTON_COLOR)
+    save_button_rect, save_hover = draw_button(screen, "Press 'S' to Save", button_x, button_y, button_width, button_height, BUTTON_COLOR, font_size)
     return save_button_rect, save_hover
     
 def PyHebText(txtString=''):
@@ -233,17 +241,20 @@ def draw_version_and_user():
     screen.blit(user_text, user_rect)
     
 def change_window_size():
+    global WINDOW_SIZE
     # Get system screen info
     info = pygame.display.Info()
     screen_height = info.current_h
-    print(screen_height)
+    print(f"Detected screen height: {screen_height}")
     
     if screen_height > 1000:
         WINDOW_SIZE = 1000
 
     elif screen_height <= 1000:
         WINDOW_SIZE = min(1000, screen_height - 100)
+        # print(WINDOW_SIZE)
     
+    print(f"Adjusted window size: {WINDOW_SIZE}")
     return WINDOW_SIZE  # Return proper window size
 
 
