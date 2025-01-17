@@ -34,6 +34,9 @@ colors = [
     (0, 188, 212)    # Cyan
 ]
 
+# Window size
+WINDOW_SIZE = 1000;
+
 def generate_color_palette(divisor):
     """Generate a color palette based on the divisor."""
     num_remainders = divisor  # Possible remainder values range from 0 to divisor-1
@@ -59,7 +62,7 @@ def binomial_coefficient(n, k):
         return 1
     if (n, k) in binomial_cache:
         return binomial_cache[(n, k)]
-    result = binomial_coefficient(n - 1, k - 1) + binomial_coefficient(n - 1, k)
+    result = binomial_coefficient(n - 1, k - 1) + binomial_coefficient(n - 1, k) # Recursive call of nCk
     binomial_cache[(n, k)] = result
     return result
 
@@ -179,6 +182,19 @@ def draw_reset_text():
     text_rect = text.get_rect(center=(800, 200))  # Center on right side
     screen.blit(text, text_rect)
     
+def draw_save_button():
+    # Define the button dimensions as a proportion of the window size
+    button_width = int(WINDOW_SIZE * 0.22)  # 22% of the window width
+    button_height = int(WINDOW_SIZE * 0.05)  # 5% of the window height
+    
+    # Define the button position (you can tweak these percentages as needed)
+    button_x = int(WINDOW_SIZE * 0.75)  # 75% from the left
+    button_y = int(WINDOW_SIZE * 0.30)  # 30% from the top
+    
+    # Draw the button
+    save_button_rect, save_hover = draw_button(screen, "Press 'S' to Save", button_x, button_y, button_width, button_height, BUTTON_COLOR)
+    return save_button_rect, save_hover
+    
 def PyHebText(txtString=''):
     """Convert Hebrew text to text suitable for pygame."""
     # Reverse the string and return it
@@ -198,7 +214,7 @@ def draw_basad_text():
     text = font.render(hebrew_text, True, (255, 255, 255))  # White color text
     
     # Get the text's rectangle and position it
-    text_rect = text.get_rect(center=(950, 30))  # Adjust position as needed
+    text_rect = text.get_rect(center=(WINDOW_SIZE - 50, 30))  # Position near top-right corner
     screen.blit(text, text_rect)
     
 def draw_version_and_user():
@@ -215,11 +231,31 @@ def draw_version_and_user():
     user_text = font.render(github_user, True, (255, 255, 255))
     user_rect = user_text.get_rect(topleft=(10, 30))  # Position below version
     screen.blit(user_text, user_rect)
+    
+def change_window_size():
+    # Get system screen info
+    info = pygame.display.Info()
+    screen_height = info.current_h
+    print(screen_height)
+    
+    if screen_height > 1000:
+        WINDOW_SIZE = 1000
+
+    elif screen_height <= 1000:
+        WINDOW_SIZE = min(1000, screen_height - 100)
+    
+    return WINDOW_SIZE  # Return proper window size
+
 
 def main():
     pygame.init()
     global screen
-    screen = pygame.display.set_mode((1000, 1000))
+    
+    # Change appropriate window size
+    change_window_size()
+    print(WINDOW_SIZE)
+    screen = pygame.display.set_mode((WINDOW_SIZE, WINDOW_SIZE))
+
     pygame.display.set_caption("Pascal's Triangle")
 
 
@@ -265,8 +301,8 @@ def main():
         draw_reset_text()  # Add reset text
         pygame.display.flip()
         
-        # Add Save Option
-        save_button_rect, save_hover = draw_button(screen, "Press 'S' to Save", 750, 300, 220, 50, BUTTON_COLOR)
+        # Draw Save button
+        draw_save_button()
         pygame.display.flip()
 
         # Wait for Enter key
