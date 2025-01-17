@@ -1,5 +1,8 @@
 import pygame
 import sys
+from tkinter import Tk
+from tkinter.filedialog import asksaveasfilename
+from datetime import datetime
 
 # Cell_Size Constants
 BIG_CELL_SIZE = 20
@@ -186,8 +189,13 @@ def main():
         pygame.draw.rect(screen, (20, 20, 40), (300, 0, 700, 1000))
 
         # Draw triangle
+        rows = {BIG_CELL_SIZE: 45, MEDIUM_CELL_SIZE: 93, SMALL_CELL_SIZE: 180, SUPER_SMALL_CELL_SIZE: 465}[cell_size]
         draw_pascals_triangle(screen, divisor, cell_size)
         draw_reset_text()  # Add reset text
+        pygame.display.flip()
+        
+        # Add Save Option
+        save_button_rect, save_hover = draw_button(screen, "Press 'S' to Save", 750, 300, 220, 50, BUTTON_COLOR)
         pygame.display.flip()
 
         # Wait for Enter key
@@ -200,6 +208,36 @@ def main():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     waiting = False
                     pygame.display.flip()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                        save_triangle_as_image(divisor, cell_size, rows)
+                    
+                    
+# Function to save the triangle
+def save_triangle_as_image(divisor, cell_size, rows):
+    """Save the Pascal's Triangle as an image."""
+    # Create an off-screen surface
+    width, height = 1000, 1000  # Adjust dimensions as needed
+    save_surface = pygame.Surface((width, height))
+    
+    # Fill the background color
+    save_surface.fill((20, 20, 40))  # Dark blue-gray background
+    
+    # Draw the Pascal's Triangle on the save_surface
+    draw_pascals_triangle(save_surface, divisor, cell_size, show_rem=False)
+    
+    # Initialize Tkinter root window (hidden)
+    Tk().withdraw()  # Hide the root window
+    # Open the save file dialog
+    filename = asksaveasfilename(defaultextension=".png",
+                                 filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+                                 title="Save Pascal's Triangle")
+    
+    # If the user selected a file
+    if filename:
+        pygame.image.save(save_surface, filename)
+        print(f"Triangle saved as {filename}")
+    else:
+        print("Save cancelled.")
 
 if __name__ == "__main__":
     main()
