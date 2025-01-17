@@ -1,3 +1,5 @@
+VERSION = "v-0.0.5"
+
 import pygame
 import sys
 from tkinter import Tk
@@ -192,6 +194,13 @@ def draw_basad_text():
     # Get the text's rectangle and position it
     text_rect = text.get_rect(center=(950, 30))  # Adjust position as needed
     screen.blit(text, text_rect)
+    
+def draw_version():
+    """Display the version on the screen."""
+    font = pygame.font.Font(None, 25)
+    text = font.render(VERSION, True, (255, 255, 255))
+    text_rect = text.get_rect(topleft=(10, 10))
+    screen.blit(text, text_rect)
 
 def main():
     pygame.init()
@@ -203,6 +212,7 @@ def main():
     while True:
         screen.fill((20, 20, 40)) # Dark blue-gray background
         draw_basad_text()
+        draw_version()
         
         # Draw UI elements
         buttons = draw_ui()
