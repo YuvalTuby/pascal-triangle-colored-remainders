@@ -7,6 +7,10 @@
 3. Add custom color palette the user can choose for each remainder
     a. use different color[] from the Dynamic Palette
 
+IMPORTANT FIX:
+    1. Dynamic screen size change, not fully working
+        a. adapt the dynamic change to all buttons and UI, sizes, positions, etc.
+
 FIX:
     1. get value of Divisor, by the current value inside it, not having to do ENTER
         -> Dynamic change of cell size
