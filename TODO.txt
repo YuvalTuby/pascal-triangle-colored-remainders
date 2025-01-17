@@ -4,6 +4,9 @@
         a. show nCk inside cell
         b. show line number near most left cell
 
+3. Add custom color palette the user can choose for each remainder
+    a. use different color[] from the Dynamic Palette
+
 FIX:
     1. get value of Divisor, by the current value inside it, not having to do ENTER
         -> Dynamic change of cell size
