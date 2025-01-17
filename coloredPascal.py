@@ -26,6 +26,21 @@ colors = [
     (0, 188, 212)    # Cyan
 ]
 
+def generate_color_palette(divisor):
+    """Generate a color palette based on the divisor."""
+    num_remainders = divisor  # Possible remainder values range from 0 to divisor-1
+    palette = []
+    
+    # Generate a color for each remainder
+    for i in range(num_remainders):
+        # Use HSV color space to generate distinct, evenly spaced colors
+        hue = i / num_remainders  # Scale hue from 0 to 1
+        color = pygame.Color(0)  # Create a blank color object
+        color.hsva = (hue * 360, 100, 100)  # Set the color in HSV (Hue, Saturation, Value)
+        palette.append(color)
+    
+    return palette
+
 
 # Memoization dictionary to store binomial coefficients
 binomial_cache = {}
@@ -41,6 +56,11 @@ def binomial_coefficient(n, k):
     return result
 
 def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
+    
+    """Draw Pascal's triangle with updated color palette."""
+    # Generate the dynamic color palette based on the divisor
+    colors = generate_color_palette(divisor)
+    
     if cell_size == BIG_CELL_SIZE:
         rows = 45
     elif cell_size == MEDIUM_CELL_SIZE:
@@ -144,7 +164,7 @@ def draw_ui(divisor=None, cell_size=None):
 
 def draw_reset_text():
     font = pygame.font.Font(None, 36)
-    text = font.render("Press Enter to Reset", True, (255, 255, 255))
+    text = font.render("Press ESC\Enter to Reset", True, (255, 255, 255))
     text_rect = text.get_rect(center=(800, 200))  # Center on right side
     screen.blit(text, text_rect)
 
@@ -205,7 +225,7 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_ESCAPE):
                     waiting = False
                     pygame.display.flip()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
