@@ -1,4 +1,4 @@
-VERSION = "v-0.0.5"
+VERSION = "v-0.0.6"
 GITHUB_USERNAME = "YuvalTuby"
 
 import pygame
