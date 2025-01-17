@@ -335,7 +335,7 @@ def main():
                     waiting = False
                     pygame.display.flip()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                        save_triangle_as_image(divisor, cell_size, rows)
+                    save_triangle_as_image(divisor, cell_size, rows)
                     
                     
 # Function to save the triangle
@@ -352,7 +352,9 @@ def save_triangle_as_image(divisor, cell_size, rows):
     draw_pascals_triangle(save_surface, divisor, cell_size, show_rem=False)
     
     # Initialize Tkinter root window (hidden)
-    Tk().withdraw()  # Hide the root window
+    root = Tk()
+    root.withdraw()  # Hide the root window
+    
     # Create a suggested filename with timestamp and parameters
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     suggested_name = f"pascal__mod_{divisor}.png"
@@ -365,6 +367,7 @@ def save_triangle_as_image(divisor, cell_size, rows):
         print(f"Triangle saved as {filename}")
     else:
         print("Save cancelled.")
+        root.destroy()
 
 if __name__ == "__main__":
     main()
