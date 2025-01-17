@@ -1,0 +1,12 @@
+1. Add option for SMALLEST_CELL_SIZE
+
+2. Add option for MAX_CELL_SIZE
+        a. show nCk inside cell
+        b. show line number near most left cell
+
+FIX:
+    1. get value of Divisor, by the current value inside it, not having to do ENTER
+        -> Dynamic change of cell size
+
+BASAD.
+    Rainbow changing colors
