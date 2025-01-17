@@ -1,4 +1,5 @@
 VERSION = "v-0.0.5"
+GITHUB_USERNAME = "YuvalTuby"
 
 import pygame
 import sys
@@ -195,12 +196,20 @@ def draw_basad_text():
     text_rect = text.get_rect(center=(950, 30))  # Adjust position as needed
     screen.blit(text, text_rect)
     
-def draw_version():
+def draw_version_and_user():
     """Display the version on the screen."""
     font = pygame.font.Font(None, 25)
-    text = font.render(VERSION, True, (255, 255, 255))
-    text_rect = text.get_rect(topleft=(10, 10))
-    screen.blit(text, text_rect)
+    
+    # Render version
+    version_text = font.render(VERSION, True, (255, 255, 255))
+    version_rect = version_text.get_rect(topleft=(10, 10))  # Top left corner
+    screen.blit(version_text, version_rect)
+    
+     # Render GitHub username
+    github_user = f"@{GITHUB_USERNAME}"
+    user_text = font.render(github_user, True, (255, 255, 255))
+    user_rect = user_text.get_rect(topleft=(10, 30))  # Position below version
+    screen.blit(user_text, user_rect)
 
 def main():
     pygame.init()
@@ -212,7 +221,7 @@ def main():
     while True:
         screen.fill((20, 20, 40)) # Dark blue-gray background
         draw_basad_text()
-        draw_version()
+        draw_version_and_user()
         
         # Draw UI elements
         buttons = draw_ui()
