@@ -1,15 +1,23 @@
-1. Add option for SMALLEST_CELL_SIZE
+1. Work on better Constants, tuple for size+rows
 
 2. Add option for MAX_CELL_SIZE
         a. show nCk inside cell
         b. show line number near most left cell
 
-3. Add custom color palette the user can choose for each remainder
-    a. use different color[] from the Dynamic Palette
+3. Add feature to show near the triangle, each color represting each modulo
+
+COLORS RELATED
+    1. Add custom color palette the user can choose for each remainder
+        a. use different color[] from the Dynamic Palette
+    2. Rainbow changing colors button (increasing order of the colors)
+
+FUN:
+    1. For Sierpiński triangle, add button under the text, to build Sierpiński triangle
+       
 
 IMPORTANT FIX:
-    1. Dynamic screen size change, not fully working
-        a. adapt the dynamic change to all buttons and UI, sizes, positions, etc.
+    ~V 1. Dynamic screen size change, not fully working
+    ~V    a. adapt the dynamic change to all buttons and UI, sizes, positions, etc.
 
 FIX:
     1. get value of Divisor, by the current value inside it, not having to do ENTER
