@@ -1,4 +1,4 @@
-VERSION = "v-0.0.9"
+VERSION = "v-0.0.10"
 GITHUB_USERNAME = "YuvalTuby"
 
 import pygame
@@ -11,12 +11,26 @@ from pathlib import Path
 # Gets hold of file directory
 FILE_DIR = Path(__file__).resolve().parent
 
-# Cell_Size Constants
-BIG_CELL_SIZE = 20
-MEDIUM_CELL_SIZE = 10
-SMALL_CELL_SIZE = 5
-SUPER_SMALL_CELL_SIZE = 2
-SMALLEST_CELL_SIZE = 1
+# Window size
+WINDOW_SIZE = 1000;
+
+# Cell size and rows constants as tuples
+CELL_SIZES_AND_ROWS = {
+    "Big": (20, 48),
+    "Medium": (10, 97),
+    "Small": (5, 194),
+    "Super Small": (2, 485),
+    "Smallest": (1, WINDOW_SIZE - 200),
+    "Primes": (1, WINDOW_SIZE - 200),
+    "Increasing": (1, WINDOW_SIZE - 200)
+}
+
+# Accessing cell size and rows
+BIG_CELL_SIZE, BIG_CELL_ROWS = CELL_SIZES_AND_ROWS["Big"]
+MEDIUM_CELL_SIZE, MEDIUM_CELL_ROWS = CELL_SIZES_AND_ROWS["Medium"]
+SMALL_CELL_SIZE, SMALL_CELL_ROWS = CELL_SIZES_AND_ROWS["Small"]
+SUPER_SMALL_CELL_SIZE, SUPER_SMALL_CELL_ROWS = CELL_SIZES_AND_ROWS["Super Small"]
+SMALLEST_CELL_SIZE, SMALLEST_CELL_ROWS = CELL_SIZES_AND_ROWS["Smallest"]
 
 # UI Color Constants
 BUTTON_COLOR = (240, 240, 240)  # Light gray
@@ -34,9 +48,6 @@ TEXT_COLOR = (0, 0, 0)  # Black
 #     (0, 188, 212)    # Cyan
 # ]
 
-# Window size
-WINDOW_SIZE = 1000;
-
 def change_window_size():
     global WINDOW_SIZE
     # Get system screen info
@@ -48,11 +59,11 @@ def change_window_size():
         WINDOW_SIZE = 1000
 
     elif screen_height <= 1000:
-        WINDOW_SIZE = min(1000, screen_height - 100)
+        WINDOW_SIZE = min(1000, screen_height - 40)  # Limit to 1000 pixels wide, or minus 40 for title bar ~32px
         # print(WINDOW_SIZE)
     
     # For Testing    
-    # WINDOW_SIZE = 800
+    # WINDOW_SIZE = screen_height - 40
     
     
     print(f"Adjusted window size: {WINDOW_SIZE}")
@@ -99,15 +110,10 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
     colors = generate_color_palette(divisor)
     rows = 10
     
-    if cell_size == BIG_CELL_SIZE:
-        rows = 48
-    elif cell_size == MEDIUM_CELL_SIZE:
-        rows = 97
-    elif cell_size == SMALL_CELL_SIZE:
-        rows = 194
-    elif cell_size == SUPER_SMALL_CELL_SIZE:
-        rows = 485
-        # rows = 970
+    for size, (size_value, row_value) in CELL_SIZES_AND_ROWS.items():
+        if cell_size == size_value:
+            rows = row_value
+            break
     
     """Draw Pascal's triangle with updated color palette."""
     start_x = WINDOW_SIZE // 2
@@ -120,6 +126,7 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
             color = colors[remainder % len(colors)]  # Cycle through colors
             x = start_x + (k - n / 2) * cell_size
             y = start_y + n * cell_size
+            
             pygame.draw.rect(screen, color, (x, y, cell_size, cell_size))
             if show_rem or cell_size == BIG_CELL_SIZE:
                 # Optionally add text inside each cell
@@ -133,7 +140,7 @@ def draw_prime_pascal_triangles(screen, divisor, cell_size, show_rem=False):
     for i in range(2, divisor + 1):
         if is_prime(i):
             draw_pascals_triangle(screen, i, cell_size, show_rem)
-            draw_divisor_text(i)
+            draw_divisor_and_rows_text(i, SMALLEST_CELL_ROWS)
             pygame.display.flip()
             pygame.time.wait(700)
             pygame.draw.rect(screen, (20, 20, 40), (300, 0, 700, 1000))
@@ -143,7 +150,7 @@ def draw_increasing_pascal_triangles(screen, divisor, cell_size):
     # Draw pascale triangles of numbers in increasing order
     for i in range(2, divisor + 1):
         draw_pascals_triangle(screen, i, cell_size)
-        draw_divisor_text(i)
+        draw_divisor_and_rows_text(i, SMALLEST_CELL_ROWS)
         pygame.display.flip()
         #pygame.time.wait(100)
         
@@ -227,16 +234,52 @@ def draw_ui(divisor=None, cell_size=None):
     # Display entered divisor
     font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
     
-    first_button_y = int(WINDOW_SIZE * 0.2)  # 2% from the top
-    buttons_x = int(WINDOW_SIZE * 0.05)  # 5% from the left
+    first_button_y = int(WINDOW_SIZE * 0.15)  # 2% from the top
+    buttons_x = int(WINDOW_SIZE * 0.02)  # 2% from the left
     
     # Draw buttons and store both rectangles and hover states
-    big_rect, big_hover, big_text = draw_button(screen, "Big", buttons_x, first_button_y, font_size * 5, font_size * 1.05, BUTTON_COLOR, font_size)
-    med_rect, med_hover, med_text = draw_button(screen, "Medium", buttons_x, first_button_y + font_size*1.25, font_size * 5, font_size * 1.05, BUTTON_COLOR, font_size)
-    small_rect, small_hover, small_text = draw_button(screen, "Small", buttons_x, first_button_y + font_size*2.5, font_size * 5, font_size * 1.05, BUTTON_COLOR, font_size)
-    super_rect, super_hover, super_text = draw_button(screen, "Super Small", buttons_x, first_button_y + font_size*3.75, font_size * 5, font_size * 1.05, BUTTON_COLOR, font_size)
-    primes_rect, primes_hover, primes_text = draw_button(screen, "Primes", buttons_x, first_button_y + font_size*5, font_size * 5, font_size * 1.05, BUTTON_COLOR, font_size)
-    increasing_rect, increasing_hover, increasing_text = draw_button(screen, "Increasing", buttons_x, first_button_y + font_size*6.25, font_size * 5, font_size * 1.05, BUTTON_COLOR, font_size)
+    big_rect, big_hover, big_text = (
+        draw_button(screen, "Big", buttons_x, 
+        first_button_y, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
+    med_rect, med_hover, med_text = (
+        draw_button(screen, "Medium", buttons_x, 
+        first_button_y + font_size*1.25, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
+    small_rect, small_hover, small_text = (
+        draw_button(screen, "Small", buttons_x, 
+        first_button_y + font_size*2.5, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
+    super_rect, super_hover, super_text = (
+        draw_button(screen, "Super Small", buttons_x, 
+        first_button_y + font_size*3.75, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
+    smallest_rect, smallest_hover, smallest_text = (
+        draw_button(screen, "Smallest", buttons_x, 
+        first_button_y + font_size*5, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
+    primes_rect, primes_hover, primes_text = (
+        draw_button(screen, "Primes", buttons_x, 
+        first_button_y + font_size*6.25, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
+    increasing_rect, increasing_hover, increasing_text = (
+        draw_button(screen, "Increasing", buttons_x, 
+        first_button_y + font_size*7.5, 
+        font_size * 5, 
+        font_size * 1.05, BUTTON_COLOR, font_size))
+    
     print(big_text)
     print(med_text)
 
@@ -245,7 +288,8 @@ def draw_ui(divisor=None, cell_size=None):
             (small_rect, small_hover, small_text),
             (super_rect, super_hover, super_text),
             (primes_rect, primes_hover, primes_text),
-            (increasing_rect, increasing_hover, increasing_text))
+            (increasing_rect, increasing_hover, increasing_text),
+            (smallest_rect, smallest_hover, smallest_text))
 
 def draw_reset_text():
     font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
@@ -274,11 +318,18 @@ def draw_save_button():
     save_button_rect, save_hover, _ = draw_button(screen, "Press 'S' to Save", button_x, button_y, button_width, button_height, BUTTON_COLOR, font_size)
     return save_button_rect, save_hover
 
-def draw_divisor_text(divisor):
+def draw_divisor_and_rows_text(divisor, rows=None):
     font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
     font = pygame.font.Font(None, font_size)
-    text = font.render(f"mod: {divisor}", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(WINDOW_SIZE * 0.72, WINDOW_SIZE * 0.065))  # Position below version
+    text = font.render(f"mod: {divisor} , rows: {rows}", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(WINDOW_SIZE * 0.72, WINDOW_SIZE * 0.065))
+    screen.blit(text, text_rect)
+    
+def draw_sierpinski_text():
+    font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
+    font = pygame.font.Font(None, font_size)
+    text = font.render("~Sierpiński Triangle!", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(WINDOW_SIZE * 0.72, WINDOW_SIZE * 0.1))  # Position below version
     screen.blit(text, text_rect)
     
 def PyHebText(txtString=''):
@@ -342,7 +393,7 @@ def main():
         # Get divisor input while keeping buttons visible
         while True:
             try:
-                divisor = int(get_input("Divisor: ", int(WINDOW_SIZE * 0.05), int(WINDOW_SIZE * 0.15)))
+                divisor = int(get_input("Divisor: ", int(WINDOW_SIZE * 0.02), int(WINDOW_SIZE * 0.08)))
                 if divisor > 0:  # Ensure positive divisor
                     break
                 else:
@@ -367,18 +418,8 @@ def main():
                         if rect.collidepoint(mouse_pos):
                             cell_size = BIG_CELL_SIZE
                             # Determine which button was clicked
-                            if text == "Big":
-                                cell_size = BIG_CELL_SIZE
-                            elif text == "Medium":
-                                cell_size = MEDIUM_CELL_SIZE
-                            elif text == "Small":
-                                cell_size = SMALL_CELL_SIZE
-                            elif text == "Super Small":
-                                cell_size = SUPER_SMALL_CELL_SIZE
-                            elif text == "Primes":
-                                cell_size = SUPER_SMALL_CELL_SIZE
-                            elif text == "Increasing":
-                                cell_size = SUPER_SMALL_CELL_SIZE
+                            if text in CELL_SIZES_AND_ROWS:
+                                cell_size = CELL_SIZES_AND_ROWS[text][0]
                             
                             button_clicked = True
                             
@@ -388,18 +429,23 @@ def main():
 
                             # Draw triangle
                             
-                            if text == "Big" or text == "Medium" or text == "Small" or text == "Super Small":
+                            if text == "Big" or text == "Medium" or text == "Small" or text == "Super Small" or text == "Smallest":
                                 draw_pascals_triangle(screen, divisor, cell_size)
-                                draw_divisor_text(divisor)
+                                draw_divisor_and_rows_text(divisor, CELL_SIZES_AND_ROWS[text][1])
+                                
+                                # Check if div=2 for Sierpinski triangle text
+                                if(divisor == 2):
+                                    draw_sierpinski_text()
+                                
                             elif text == "Primes":
                                 draw_prime_pascal_triangles(screen, divisor, cell_size)
-                                draw_divisor_text(divisor)
+                                draw_divisor_and_rows_text(divisor, CELL_SIZES_AND_ROWS[text][1])
                             elif text == "Increasing":
                                 # TODO:
                                 # Show input box to ask for the delay time
                                 #delay_input = get_input("Delay (ms): ", int(WINDOW_SIZE * 0.05), int(WINDOW_SIZE * 0.15))
                                 draw_increasing_pascal_triangles(screen, divisor, cell_size)
-                                draw_divisor_text(divisor)
+                                draw_divisor_and_rows_text(divisor, CELL_SIZES_AND_ROWS[text][1])
                             
                             draw_pascals_triangle(screen, divisor, cell_size)
                             draw_reset_text()  # Add reset text
@@ -431,7 +477,7 @@ def main():
 def save_triangle_as_image(divisor, cell_size):
     """Save the Pascal's Triangle as an image."""
     # Create an off-screen surface
-    width, height = 1000, 1000  # Adjust dimensions as needed
+    width, height = WINDOW_SIZE, WINDOW_SIZE  # Adjust dimensions as needed
     save_surface = pygame.Surface((width, height))
     
     # Fill the background color
@@ -446,7 +492,7 @@ def save_triangle_as_image(divisor, cell_size):
     
     # Create a suggested filename with timestamp and parameters
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    suggested_name = f"pascal__mod_{divisor}.png"
+    suggested_name = f"pascal_mod_{divisor}.png"
     filename = asksaveasfilename(defaultextension=".png",
                                 filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
                                 title="Save Pascal's Triangle",
