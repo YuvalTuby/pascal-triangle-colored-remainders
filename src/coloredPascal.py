@@ -1,4 +1,4 @@
-VERSION = "v-0.0.10"
+VERSION = "v-0.0.11"
 GITHUB_USERNAME = "YuvalTuby"
 
 import pygame
@@ -15,8 +15,8 @@ FILE_DIR = Path(__file__).resolve().parent
 WINDOW_SIZE = 1000;
 
 # Cell size and rows constants as tuples
-CELL_SIZES_AND_ROWS = {
-    "Big": (20, 48),
+CELL_SIZES_AND_ROWS = { # "Name": (cell_size, rows)
+    "Big": (40, 20),
     "Medium": (10, 97),
     "Small": (5, 194),
     "Super Small": (2, 485),
@@ -166,13 +166,30 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
             if show_rem or cell_size == BIG_CELL_SIZE:
                 # Optionally add text inside each cell
                 font = pygame.font.Font(None, 24)
-                text = font.render(str(remainder), True, (255, 255, 255))  # White text
+                text_color = (255, 255, 255) if remainder == 0 else (0, 0, 0)  # White text for 0, black for others
+                text = font.render(str(value), True, text_color)  # White text
                 text_rect = text.get_rect(center=(x + cell_size / 2, y + cell_size / 2))
                 screen.blit(text, text_rect)
               
         # # For SMALLEST_CELL_SIZE, update display every few rows for smoother drawing  
         # if n % 100 == 0:
         #     pygame.display.flip()
+        
+def draw_color_mods(screen, divisor):
+    
+    colors = generate_color_palette(divisor)
+    font_size = int(WINDOW_SIZE * 0.036)  # 3.6% of window size
+    font = pygame.font.Font(None, font_size)
+    
+    for i in range(divisor):
+        x = WINDOW_SIZE * 0.62 + 22 * i - 22 * 14 * (i // 14)
+        y = WINDOW_SIZE * 0.09 + 22 * (i // 14)
+        pygame.draw.rect(screen, colors[i], (x, y, 20, 20))
+        text_color = (255, 255, 255) if i == 0 else (0, 0, 0)  # White text for 0, black for others
+        text = font.render(str(i), True, text_color)
+        text_rect = text.get_rect(center=(x + 10, y + 10))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
                 
 def draw_prime_pascal_triangles(screen, divisor, cell_size, show_rem=False):
     # Draw pascale triangles of prime numbers with delay
@@ -336,8 +353,12 @@ def draw_reset_text():
     text = font.render("Press ESC\Enter to Reset", True, (255, 255, 255))
     
     # Position text proportionally to window
-    text_x = int(WINDOW_SIZE * 0.8)  # 75% from left, matching save button
-    text_y = int(WINDOW_SIZE * 0.20)  # 20% from top
+    #text_x = int(WINDOW_SIZE * 0.8)  # 80% from left
+    #text_y = int(WINDOW_SIZE * 0.20)  # 20% from top
+    
+    #center=(WINDOW_SIZE * 0.72, WINDOW_SIZE * 0.065)
+    text_x = int(WINDOW_SIZE * 0.72)
+    text_y = int(WINDOW_SIZE * 0.038) 
     
     text_rect = text.get_rect(center=(text_x, text_y))  # Center on right side
     screen.blit(text, text_rect)
@@ -377,17 +398,17 @@ def PyHebText(txtString=''):
     return txtString[::-1]
     
 def draw_basad_text():
-    # Load a font that supports Hebrew
-    # Dynamic path to the font file
-    font_path = FILE_DIR / "Arial.ttf"  # Replace with the correct path to a Hebrew-supporting font
-    font = pygame.font.Font(font_path, 20)
+    # # Load a font that supports Hebrew
+    # # Dynamic path to the font file
+    # font_path = FILE_DIR / "Arial.ttf"  # Replace with the correct path to a Hebrew-supporting font
+    font = pygame.font.Font(None, 25)
     
-    # Hebrew text
-    basad = "בס\"ד"
-    hebrew_text = PyHebText(basad)
+    # # Hebrew text
+    # basad = "בס\"ד"
+    # hebrew_text = PyHebText(basad)
     
     # Render the text with the appropriate font
-    text = font.render(hebrew_text, True, (255, 255, 255))  # White color text
+    text = font.render("BS\"D", True, (255, 255, 255))  # White color text
     
     # Get the text's rectangle and position it
     text_rect = text.get_rect(center=(WINDOW_SIZE - 50, 30))  # Position near top-right corner
@@ -471,6 +492,7 @@ def main():
                             if text == "Big" or text == "Medium" or text == "Small" or text == "Super Small" or text == "Smallest":
                                 draw_pascals_triangle(screen, divisor, cell_size)
                                 draw_divisor_and_rows_text(divisor, CELL_SIZES_AND_ROWS[text][1])
+                                draw_color_mods(screen, divisor)
                                 
                                 # Check if div=2 for Sierpinski triangle text
                                 if(divisor == 2):
