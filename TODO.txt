@@ -6,6 +6,8 @@
 
 3. Add feature to show near the triangle, each color represting each modulo
 
+4. Try: Zooming out/in
+
 COLORS RELATED
     1. Add custom color palette the user can choose for each remainder
         a. use different color[] from the Dynamic Palette
