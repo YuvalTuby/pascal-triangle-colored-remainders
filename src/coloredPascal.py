@@ -103,6 +103,41 @@ def binomial_coefficient(n, k):
     binomial_cache[(n, k)] = result
     return result
 
+def simulate_large_pascals_triangle(screen, cell_size, divisor, max_rows=5000, displayed_rows=800):
+    """
+    Simulates how a large Pascal's Triangle would look by scaling down the rows.
+    
+    Args:
+        screen: The pygame screen to draw on.
+        cell_size: Size of each cell.
+        divisor: Modulus for coloring.
+        max_rows: Total number of rows to simulate.
+        displayed_rows: Number of rows to actually render.
+    """
+    scaling_factor = max_rows / displayed_rows
+    colors = generate_color_palette(divisor)  # Use the existing function to generate colors
+    start_x = WINDOW_SIZE // 2
+    start_y = 20
+
+    for displayed_row in range(displayed_rows):
+        # Calculate the corresponding "real" row
+        real_row = int(displayed_row * scaling_factor)
+        for k in range(real_row + 1):
+            value = binomial_coefficient(real_row, k)
+            remainder = value % divisor
+            color = colors[remainder]
+            
+            # Calculate position
+            x = start_x + (k - real_row / 2) * cell_size
+            y = start_y + displayed_row * cell_size
+            
+            # Draw cell
+            pygame.draw.rect(screen, color, (x, y, cell_size, cell_size))
+        
+        # Update display every few rows for smoother drawing
+        if displayed_row % 100 == 0:
+            pygame.display.flip()
+
 def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
     
     """Draw Pascal's triangle with updated color palette."""
@@ -134,13 +169,17 @@ def draw_pascals_triangle(screen, divisor, cell_size, show_rem=False):
                 text = font.render(str(remainder), True, (255, 255, 255))  # White text
                 text_rect = text.get_rect(center=(x + cell_size / 2, y + cell_size / 2))
                 screen.blit(text, text_rect)
+              
+        # # For SMALLEST_CELL_SIZE, update display every few rows for smoother drawing  
+        # if n % 100 == 0:
+        #     pygame.display.flip()
                 
 def draw_prime_pascal_triangles(screen, divisor, cell_size, show_rem=False):
     # Draw pascale triangles of prime numbers with delay
     for i in range(2, divisor + 1):
         if is_prime(i):
             draw_pascals_triangle(screen, i, cell_size, show_rem)
-            draw_divisor_and_rows_text(i, SMALLEST_CELL_ROWS)
+            draw_divisor_and_rows_text(i, CELL_SIZES_AND_ROWS["Super Small"][1])
             pygame.display.flip()
             pygame.time.wait(700)
             pygame.draw.rect(screen, (20, 20, 40), (300, 0, 700, 1000))
@@ -150,7 +189,7 @@ def draw_increasing_pascal_triangles(screen, divisor, cell_size):
     # Draw pascale triangles of numbers in increasing order
     for i in range(2, divisor + 1):
         draw_pascals_triangle(screen, i, cell_size)
-        draw_divisor_and_rows_text(i, SMALLEST_CELL_ROWS)
+        draw_divisor_and_rows_text(i, CELL_SIZES_AND_ROWS["Super Small"][1])
         pygame.display.flip()
         #pygame.time.wait(100)
         
